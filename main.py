@@ -24,7 +24,7 @@ def print_directory_tree(path, prefix="", spec=None):
     :param spec: The PathSpec object containing ignore rules.
     """
     try:
-        entries = sorted(os.listdir(path))  # Sort to ensure consistent order
+        entries = sorted(os.listdir(path))
     except PermissionError:
         print(f"{prefix}Permission denied: {path}")
         return
@@ -35,17 +35,15 @@ def print_directory_tree(path, prefix="", spec=None):
     for index, entry in enumerate(entries):
         entry_path = os.path.join(path, entry)
         
-        # Explicitly ignore 'node_modules' directories
         if entry == "node_modules" and os.path.isdir(entry_path):
             continue
         
-        # Check if the file or directory should be ignored based on .gitignore
         if spec and spec.match_file(entry_path.replace("\\", "/")):
             continue
 
         connector = "└── " if index == len(entries) - 1 else "├── "
         print(f"{prefix}{connector}{entry}")
-        if os.path.isdir(entry_path):  # If the entry is a directory, recurse into it
+        if os.path.isdir(entry_path):
             extension = "    " if index == len(entries) - 1 else "│   "
             print_directory_tree(entry_path, prefix + extension, spec)
 
@@ -57,29 +55,23 @@ def main():
     print("Enter a directory path to generate its tree structure, or type 'exit' to quit.\n")
     
     while True:
-        # Prompt the user for a directory path
         path = input("Enter directory path: ").strip()
         
-        # Exit condition
         if path.lower() == 'exit':
             print("Exiting the program. Goodbye!")
             break
 
-        # Validate the input path
         if not os.path.exists(path):
             print("Invalid path. Please enter a valid directory path.\n")
             continue
         
-        # Load .gitignore if it exists
         gitignore_spec = load_gitignore(path)
 
-        # Generate and display the directory tree
         print(f"\nDirectory Tree for: {path}\n")
         print(path)
         print_directory_tree(path, spec=gitignore_spec)
         print("\nTree generated successfully. Enter another path or type 'exit' to quit.\n")
 
-# Entry point for the script
 if __name__ == "__main__":
     try:
         main()
