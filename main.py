@@ -3,11 +3,6 @@ import sys
 from pathspec import PathSpec
 
 def load_gitignore(path):
-    """
-    Load the .gitignore file and parse its patterns.
-    :param path: The directory containing the .gitignore file.
-    :return: A PathSpec object with the parsed patterns or None if no .gitignore is found.
-    """
     gitignore_path = os.path.join(path, ".gitignore")
     if os.path.exists(gitignore_path):
         with open(gitignore_path, "r") as file:
@@ -16,13 +11,6 @@ def load_gitignore(path):
     return None
 
 def print_directory_tree(path, prefix="", spec=None):
-    """
-    Recursively prints the directory structure in a tree format, ignoring files specified in .gitignore.
-    Also explicitly ignores 'node_modules' folders.
-    :param path: The directory path to scan.
-    :param prefix: The prefix used to format the tree structure.
-    :param spec: The PathSpec object containing ignore rules.
-    """
     try:
         entries = sorted(os.listdir(path))
     except PermissionError:
@@ -35,7 +23,7 @@ def print_directory_tree(path, prefix="", spec=None):
     for index, entry in enumerate(entries):
         entry_path = os.path.join(path, entry)
         
-        if entry == "node_modules" and os.path.isdir(entry_path):
+        if entry in ["node_modules", "venv", ".git"] and os.path.isdir(entry_path):
             continue
         
         if spec and spec.match_file(entry_path.replace("\\", "/")):
@@ -48,9 +36,6 @@ def print_directory_tree(path, prefix="", spec=None):
             print_directory_tree(entry_path, prefix + extension, spec)
 
 def main():
-    """
-    Main program loop for generating directory trees.
-    """
     print("Welcome to Directory Structure Viewer!")
     print("Enter a directory path to generate its tree structure, or type 'exit' to quit.\n")
     
